@@ -2,50 +2,54 @@ import requests
 import json
 import subprocess
 
-BaseSender = 'BScjubKYSj779oXWygw1EbfRTgVjtQHPGQ'
-Bank = 'BScjubKYSj779oXWygw1EbfRTgVjtQHPGQ'
-privateKey = ''
+SMILEY_CONSOLE = "smileycoin-cli"
+BANK = 'BScjubKYSj779oXWygw1EbfRTgVjtQHPGQ'
 
-smileyConsole = 'smileycoin-cli'
+class Client:
+    """Smiley coin trading client instance"""
+    def __init__(self, clientAddress):
+        """
+        Constructor for the trading client.
+        Takes a client address to operate using.
+        """
+        self.address = clientAddress
 
-BaseResiver = ''
+    def getMarketValue(self):
+        """Gets current market value of SMLY in USD"""
+        return float(json.loads(requests.get("https://chainz.cryptoid.info/smly/api.dws?q=ticker.usd").text))
 
-def getUserBalance(baseAddress):
-    response = json.loads(requests.get("https://blocks.smileyco.in/api/addr/"+ BaseSender +"/").text)
-    return response['balance']
+    def printMarketValue(self):
+        """Prints the current market value of SMLY in USD"""
+        print(f"Market value: ${format(self.getMarketValue(), 'f')}")
 
-def sendtoaddress(resive, amount, comment):
-    if amount <= getUserBalance(BaseSender):
-        subprocess.call(smileyConsole +' sendtoaddress '+ resive +' '+ amount + '( "'+ comment +'" "'+resive+'" )', shell=True)
-    else:
-        print("get more money!")
+    def getUserBalance(self):
+        """Gets the users current SMLY balance"""
+        return json.loads(requests.get("https://blocks.smileyco.in/api/addr/"+ self.address +"/").text)['balance']
 
-def importprivkey(key):
-    subprocess.call(smileyConsole +' importprivkey '+ key, shell=True)
+    def printUserBalance(self):
+        """Prints the users current SMLY balance"""
+        print(f"Current balance: {self.getUserBalance()} SMLY")
 
-def displayBaseSender(sender):
-    response = json.loads(requests.get("https://blocks.smileyco.in/api/addr/"+ BaseSender +"/").text)
-    print("BaseAddress: "+ response['addrStr'])
-    print("Balance: "+ str(response['balance'])+"&sml")
+    def displayClient(self):
+        """Displays the clients address and current balance"""
+        print(f"Address: {self.address}")
+        print(f"Balance: {self.getUserBalance} SMLY")
 
-def getMarketValue():
-    response = json.loads(requests.get("https://chainz.cryptoid.info/smly/api.dws?q=ticker.usd").text)
-    print("MarketValue: $" + format(float(response), 'f'))
+    def sendToAddress(self, recipient, ammount, comment=None):
+        """Sends an ammount to a recipient with"""
+        if ammount < self.getUserBalance():
+            query = f"{SMILEY_CONSOLE} sendtoaddress {recipient} {ammount}" + (f" ( '{comment}' '{recipient}' )") if comment else ''
+            subprocess.call(query, shell=True)
+        else:
+            print(f"User has inadiquade funds.\nCurrent balance is {self.getUserBalance()} and is smaller than the requested transfer of {ammount}.")
 
-def sellCoin(amount):
-    if amount <= getUserBalance(BaseSender):
-        subprocess.call(smileyConsole +' sendtoaddress '+ Bank +' '+ amount, shell=True)
-    else:
-        print("bruh are you broke!?")
+    def importPrivateKey(self, key):
+        """Imports a private key into the wallet"""
+        subprocess.call(f"{SMILEY_CONSOLE} importprivkey {key}", shell=True)
 
-# def buyCoin(amount, trade):
-
-# for trans in response['transactions']:
-#     transInfo = json.loads(requests.get("https://blocks.smileyco.in/api/tx/"+trans).text)
-#     print(transInfo['vout'][0]['value'])
-
-# sendtoaddress(smileyConsole, BaseResiver, 5, "Testing this shit")
-
-# importprivkey(privateKey)
-displayBaseSender(BaseSender)
-getMarketValue()
+    def sellCoin(self, ammount):
+        """Sells a given ammount of SMLY to the bank"""
+        if ammount <= self.getUserBalance(self.address):
+            subprocess.call(SMILEY_CONSOLE +' sendtoaddress '+ BANK +' '+ ammount, shell=True)
+        else:
+            print(f"User has inadiquade funds\nCurrent balance is {self.getUserBalance()} and is smaller than the requested transfer of {ammount}")
