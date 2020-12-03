@@ -7,6 +7,7 @@ BANK = 'BScjubKYSj779oXWygw1EbfRTgVjtQHPGQ'
 
 class Client:
     """Smiley coin trading client instance"""
+
     def __init__(self, clientAddress):
         """
         Constructor for the trading client.
@@ -35,21 +36,21 @@ class Client:
         print(f"Address: {self.address}")
         print(f"Balance: {self.getUserBalance} SMLY")
 
-    def sendToAddress(self, recipient, ammount, comment=None):
-        """Sends an ammount to a recipient with"""
-        if ammount < self.getUserBalance():
-            query = f"{SMILEY_CONSOLE} sendtoaddress {recipient} {ammount}" + (f" ( '{comment}' '{recipient}' )") if comment else ''
+    def sendToAddress(self, recipient, amount, comment=None):
+        """Sends an amount to a recipient with"""
+        if amount < self.getUserBalance():
+            query = f"{SMILEY_CONSOLE} sendtoaddress {recipient} {amount}" + (f" ( '{comment}' '{recipient}' )") if comment else ''
             subprocess.call(query, shell=True)
         else:
-            print(f"User has inadiquade funds.\nCurrent balance is {self.getUserBalance()} and is smaller than the requested transfer of {ammount}.")
+            print(f"User has inadiquade funds.\nCurrent balance is {self.getUserBalance()} and is smaller than the requested transfer of {amount}.")
 
     def importPrivateKey(self, key):
         """Imports a private key into the wallet"""
         subprocess.call(f"{SMILEY_CONSOLE} importprivkey {key}", shell=True)
 
-    def sellCoin(self, ammount):
-        """Sells a given ammount of SMLY to the bank"""
-        if ammount <= self.getUserBalance(self.address):
-            subprocess.call(SMILEY_CONSOLE +' sendtoaddress '+ BANK +' '+ ammount, shell=True)
+    def sellCoin(self, amount):
+        """Sells a given amount of SMLY to the bank"""
+        if amount <= self.getUserBalance(self.address):
+            subprocess.call(SMILEY_CONSOLE +' sendtoaddress '+ BANK +' '+ amount, shell=True)
         else:
-            print(f"User has inadiquade funds\nCurrent balance is {self.getUserBalance()} and is smaller than the requested transfer of {ammount}")
+            print(f"User has inadiquade funds\nCurrent balance is {self.getUserBalance()} and is smaller than the requested transfer of {amount}")
